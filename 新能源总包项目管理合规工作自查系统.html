@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>新能源总包项目费用合规管理自查系统</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #2e7d32;
+        --secondary-color: #4caf50;
+        --accent-color: #8bc34a;
+        --light-color: #e8f5e9;
+        --dark-color: #1b5e20;
+        --text-color: #333;
+        --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Noto Sans SC", "Microsoft YaHei", Arial, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #f5fdf6 0%, #ffffff 100%);
+        color: var(--text-color);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* 首页样式 */
+      .home-header {
+        text-align: center;
+        padding: 40px 0;
+        margin-bottom: 30px;
+        position: relative;
+      }
+
+      .home-header h1 {
+        font-size: 2.8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        letter-spacing: 1px;
+      }
+
+      .home-subtitle {
+        font-size: 1.5rem;
+        color: var(--dark-color);
+        font-weight: 500;
+        margin-top: 15px;
+        position: relative;
+        display: inline-block;
+      }
+
+      .home-subtitle::after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent-color),
+          transparent
+        );
+      }
+
+      .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 40px;
+      }
+
+      .module-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        border: 1px solid #e0e0e0;
+        height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-decoration: none;
+      }
+
+      .module-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .module-header {
+        background: linear-gradient(
+          90deg,
+          var(--secondary-color) 0%,
+          var(--accent-color) 100%
+        );
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .module-header::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+      }
+
+      .module-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+      }
+
+      .module-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+
+      .energy-elements {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 300px;
+        height: 200px;
+        pointer-events: none;
+        z-index: -1;
+        opacity: 0.1;
+      }
+
+      .wind-turbine {
+        position: absolute;
+        bottom: 0;
+        right: 50px;
+        width: 40px;
+        height: 100px;
+        background: var(--dark-color);
+        border-radius: 20px 20px 0 0;
+      }
+
+      .wind-turbine::before {
+        content: "";
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 8px solid var(--accent-color);
+        border-top-color: transparent;
+        animation: spin 10s linear infinite;
+      }
+
+      .solar-panel {
+        position: absolute;
+        bottom: 0;
+        right: 150px;
+        width: 100px;
+        height: 60px;
+        background: var(--dark-color);
+        transform: skew(-20deg);
+        box-shadow: 0 0 0 5px var(--accent-color);
+      }
+
+      @keyframes spin {
+        0% {
+          transform: translateX(-50%) rotate(0deg);
+        }
+        100% {
+          transform: translateX(-50%) rotate(360deg);
+        }
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 50px;
+        padding: 20px;
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      /* 模块页面通用样式 */
+      .module-container {
+        display: none;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+      }
+
+      .module-header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .module-title-bar {
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 5px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .back-button {
+        padding: 8px 15px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .back-button:hover {
+        background-color: #2980b9;
+      }
+
+      .subtitle-container {
+        text-align: center;
+        margin: -15px 0 20px 0;
+      }
+
+      .subtitle {
+        font-size: 18px;
+        color: #555;
+        display: inline-block;
+      }
+
+      .subtitle input {
+        border: none;
+        border-bottom: 1px dashed #666;
+        padding: 0 5px;
+        margin: 0 3px;
+        width: 120px;
+        text-align: center;
+        font-size: 16px;
+        background: transparent;
+      }
+
+      .subtitle input:focus {
+        outline: none;
+        border-bottom-color: #3498db;
+      }
+
+      .subtitle input::placeholder {
+        color: #aaa;
+        font-style: italic;
+      }
+
+      .form-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+
+      .form-table th,
+      .form-table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      .form-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      .form-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      .form-table tr.active {
+        background-color: #e8f4fc;
+      }
+
+      .form-table tr.disabled {
+        background-color: #f0f0f0;
+        color: #999;
+      }
+
+      .form-table tr.completed {
+        background-color: #e8f8e8;
+      }
+
+      .stage-header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px 15px;
+        margin: 25px 0 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .stage-header:after {
+        content: "▼";
+        font-size: 12px;
+        transition: transform 0.3s;
+      }
+
+      .stage-header.collapsed:after {
+        transform: rotate(-90deg);
+      }
+
+      .stage-tips {
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f8f9fa;
+        border-left: 4px solid #3498db;
+        display: none;
+      }
+
+      .stage-tips ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .stage-tips li {
+        margin-bottom: 8px;
+      }
+
+      .options {
+        display: flex;
+        gap: 20px;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+      }
+
+      input[type="radio"] {
+        margin-right: 5px;
+      }
+
+      input[type="radio"]:disabled {
+        cursor: not-allowed;
+      }
+
+      .alert {
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 4px;
+        display: none;
+        background-color: #fcf8e3;
+        border: 1px solid #faebcc;
+        color: #8a6d3b;
+      }
+
+      .progress-container {
+        width: 100%;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+
+      .progress-bar {
+        height: 20px;
+        background-color: #4caf50;
+        border-radius: 5px;
+        width: 0%;
+        transition: width 0.5s;
+        text-align: center;
+        color: white;
+        line-height: 20px;
+      }
+
+      .jump-notice {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        display: none;
+      }
+
+      .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .nav-button {
+        padding: 8px 15px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .nav-button:hover {
+        background-color: #2980b9;
+      }
+
+      .nav-button:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+      }
+
+      .save-btn {
+        background-color: #28a745;
+        margin-left: auto;
+      }
+
+      .save-btn:hover {
+        background-color: #218838;
+      }
+
+      .export-btn {
+        background-color: #17a2b8;
+        margin-left: 10px;
+      }
+
+      .export-btn:hover {
+        background-color: #138496;
+      }
+
+      /* 导出报告样式 */
+      #exportModal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 900px;
+        max-height: 80vh;
+        overflow-y: auto;
+        border-radius: 5px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover {
+        color: black;
+      }
+
+      .export-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      .export-table th,
+      .export-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      .export-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      .export-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      .export-title {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .export-subtitle {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: #555;
+      }
+
+      .export-stage {
+        font-weight: bold;
+        background-color: #f2f2f2;
+      }
+
+      /* 打印样式 */
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        #exportContent,
+        #exportContent * {
+          visibility: visible;
+        }
+        #exportContent {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          padding: 20px;
+        }
+        .nav-buttons {
+          display: none !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .modules-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .home-header h1 {
+          font-size: 2rem;
+        }
+
+        .home-subtitle {
+          font-size: 1.2rem;
+        }
+
+        .energy-elements {
+          display: none;
+        }
+      }
+    </style>
+    <!-- Add html2pdf library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- 首页 -->
+      <div id="home-page">
+        <header class="home-header">
+          <h1>新能源总承包项目费用合规管理自查系统</h1>
+          <div class="home-subtitle">_________总承包项目</div>
+        </header>
+
+        <div class="modules-grid">
+          <a
+            class="module-card"
+            data-module="total-bid"
+            href="./新能源分包采购合规工作自查清单.html"
+          >
+            <div class="module-header">
+              <div class="module-icon">📋</div>
+              <div class="module-title">总包投标合规工作自查清单</div>
+            </div>
+          </a>
+
+          <a
+            class="module-card"
+            data-module="subcontract-purchase"
+            href="./新能源分包采购合规工作自查清单.html"
+          >
+            <div class="module-header">
+              <div class="module-icon">🛒</div>
+              <div class="module-title">分包采购合规工作自查清单</div>
+            </div>
+          </a>
+
+          <a
+            class="module-card"
+            data-module="project-execution"
+            href="./新能源项目执行合规工作自查清单.html"
+          >
+            <div class="module-header">
+              <div class="module-icon">⚙️</div>
+              <div class="module-title">项目执行合规工作自查清单</div>
+            </div>
+          </a>
+
+          <a
+            class="module-card"
+            data-module="total-settlement"
+            href="./新能源总包结算合规工作自查清单.html"
+          >
+            <div class="module-header">
+              <div class="module-icon">💰</div>
+              <div class="module-title">总包结算合规工作自查清单</div>
+            </div>
+          </a>
+
+          <a
+            class="module-card"
+            data-module="subcontract-settlement"
+            href="./新能源分包结算合规工作自查清单.html"
+          >
+            <div class="module-header">
+              <div class="module-icon">🧾</div>
+              <div class="module-title">分包结算合规工作自查清单</div>
+            </div>
+          </a>
+        </div>
+
+        <footer>
+          <p>新能源总承包项目费用合规管理自查系统 © 2023</p>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
